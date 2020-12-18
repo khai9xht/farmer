@@ -14,13 +14,11 @@ jobs:
       - run: chmod 600 ~/.ssh/private_key
       - run: ls -la
       - name: Send file tos erver
-      - run: rsync -azhv -e 'ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no' build/* --rsync-path='sudo rsync' $user@$server:$target
-        env:
-          # repo_token: ${{ secrets.GITHUB_TOKEN }}
-          user: hoangnv
-          server: 118.70.181.146
-          target: /home/hoangnv/
-        run: |
+      - run:
+          rsync -azhv -e 'ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no'
+          build/* --rsync-path='sudo rsync' $user@$server:$target
+
+      - run: |
           pip install -r requirements.txt
           dvc repro
           git fetch --prune
@@ -29,3 +27,8 @@ jobs:
           echo "## Validating results by region"
           cml-publish by_region.png --md >> report.md
           cml-send-comment report.md
+        env:
+          # repo_token: ${{ secrets.GITHUB_TOKEN }}
+          user: hoangnv
+          server: 118.70.181.146
+          target: /home/hoangnv/
