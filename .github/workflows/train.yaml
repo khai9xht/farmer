@@ -1,7 +1,7 @@
 name: farmers
 on:
   push:
-    branch:
+    branches:
       - master
 jobs:
   run:
