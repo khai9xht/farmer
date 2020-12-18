@@ -1,14 +1,25 @@
 name: farmers
-on: [push]
+on:
+  push:
+    branch:
+      - master
 jobs:
   run:
     runs-on: [ubuntu-latest]
-    container: docker://dvcorg/cml-py3:latest
     steps:
       - uses: actions/checkout@v2
-      - name: cml_run
+        # - name: cml_run
+      - run: mkdir -p ~/.ssh
+      - run: echo "${{secrets.PRIVATE_KEY}}" > ~/.ssh/private_key
+      - run: chmod 600 ~/.ssh/private_key
+      - run: ls -la
+      - name: Send file tos erver
+      - run: rsync -azhv -e 'ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no' build/* --rsync-path='sudo rsync' $user@$server:$target
         env:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          # repo_token: ${{ secrets.GITHUB_TOKEN }}
+          user: hoangnv
+          server: 118.70.181.146
+          target: /home/hoangnv/
         run: |
           pip install -r requirements.txt
           dvc repro
